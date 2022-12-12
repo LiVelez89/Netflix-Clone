@@ -14,7 +14,12 @@ enum Sections: Int {
     case Upcoming = 3
     case TopRated = 4
 }
+
 class HomeViewController: UIViewController {
+        
+    private var randomTrendingMovie: Title?
+    
+    private var headerView: HeroHeaderUIView?
     
     let sectionTitles: [String] = ["Trending Movies", "Trending TV", "Popular", "Upcoming Movies", "Top rated"]
     
@@ -35,10 +40,25 @@ class HomeViewController: UIViewController {
         
         configureNavBar()
         
-        let headerView = HeroHeaderUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
+        headerView = HeroHeaderUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTable.tableHeaderView = headerView
+        configureHeroHeaderView()
         
-
+    }
+    private func configureHeroHeaderView() {
+        
+        APICaller.shared.getTrendingMovies { [weak self]result in
+            switch result {
+            case .success(let titles):
+                let selectedTitle = titles.randomElement()
+                self?.randomTrendingMovie = titles.randomElement()
+                self?.headerView?.configure(with: TitleViewModel(titleName: selectedTitle?.original_title ?? "", posterURL: selectedTitle?.poster_path ?? ""))
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+            
+        }
+        
     }
     
     private func configureNavBar() {
@@ -75,7 +95,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CollectionViewTableViewCell.identifier, for: indexPath) as? CollectionViewTableViewCell else {
             return UITableViewCell()
         }
-    
+        
         cell.delegate = self
         // In each case we need the rawValue which will asign when we initialized or enumerate
         switch indexPath.section {
@@ -164,7 +184,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
 extension HomeViewController: CollectionViewTableViewCellDelegate {
     
     func collectionViewTableViewCellDidTapCell(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewViewModel) {
-            DispatchQueue.main.async { [weak self] in
+        DispatchQueue.main.async { [weak self] in
             let vc = TitlePreviewViewController()
             vc.configure(with: viewModel)
             self?.navigationController?.pushViewController(vc, animated: true)

@@ -47,8 +47,6 @@ class TitlePreviewViewController: UIViewController {
         return button
     }()
     
-
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -98,7 +96,7 @@ class TitlePreviewViewController: UIViewController {
         titleLabel.text = model.title
         overviewLabel.text = model.titleOverview
         
-        guard let url = URL(string: "https://www.youtube.com/embed/\(model.youtubeVideo.id.videoId)") else {
+        guard let url = URL(string: "https://www.youtube.com/embed/\(model.youtubeView.id.videoId)") else {
             return
         }
         
