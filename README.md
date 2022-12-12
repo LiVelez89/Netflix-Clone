@@ -1,2 +1,2 @@
 # Netflix-clone
-Project for academic purposes
+Personal project for studying autolayout, and API services.
