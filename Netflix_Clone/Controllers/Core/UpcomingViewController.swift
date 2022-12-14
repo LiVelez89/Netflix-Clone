@@ -89,10 +89,8 @@ extension UpcomingViewController: UITableViewDelegate, UITableViewDataSource {
                     vc.configure(with: TitlePreviewViewModel(title: titleName, youtubeView: videoElement, titleOverview: title.overview ?? ""))
                     self?.navigationController?.pushViewController(vc, animated: true)
                 }
-               
             case .failure(let error):
                 print(error.localizedDescription)
-                
             }
         }
     }

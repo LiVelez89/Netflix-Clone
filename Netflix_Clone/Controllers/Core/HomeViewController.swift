@@ -43,8 +43,8 @@ class HomeViewController: UIViewController {
         headerView = HeroHeaderUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTable.tableHeaderView = headerView
         configureHeroHeaderView()
-        
     }
+    
     private func configureHeroHeaderView() {
         
         APICaller.shared.getTrendingMovies { [weak self]result in
@@ -56,9 +56,7 @@ class HomeViewController: UIViewController {
             case .failure(let error):
                 print(error.localizedDescription)
             }
-            
         }
-        
     }
     
     private func configureNavBar() {
