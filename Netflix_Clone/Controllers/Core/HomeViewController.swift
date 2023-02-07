@@ -46,8 +46,7 @@ class HomeViewController: UIViewController {
     }
     
     private func configureHeroHeaderView() {
-        
-        APICaller.shared.getTrendingMovies { [weak self]result in
+        APICaller.shared.makeRequest(type: [Title].self, category: .trendingMovie, query: nil) { [weak self] (result) in
             switch result {
             case .success(let titles):
                 let selectedTitle = titles.randomElement()
@@ -57,6 +56,18 @@ class HomeViewController: UIViewController {
                 print(error.localizedDescription)
             }
         }
+        
+        
+//        APICaller.shared.getTrendingMovies { [weak self] result in
+//            switch result {
+//            case .success(let titles):
+//                let selectedTitle = titles.randomElement()
+//                self?.randomTrendingMovie = titles.randomElement()
+//                self?.headerView?.configure(with: TitleViewModel(titleName: selectedTitle?.original_title ?? "", posterURL: selectedTitle?.poster_path ?? ""))
+//            case .failure(let error):
+//                print(error.localizedDescription)
+//            }
+//        }
     }
     
     private func configureNavBar() {

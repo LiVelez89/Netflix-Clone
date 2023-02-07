@@ -20,7 +20,7 @@ class TitlePreviewViewController: UIViewController {
     private let titleLabel: UILabel = {
        
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false //what happens if it is true?
+        label.translatesAutoresizingMaskIntoConstraints = false 
         label.font = .systemFont(ofSize: 22, weight: .bold)
         label.text = "Harry Potter"
         return label
