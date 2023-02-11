@@ -46,28 +46,16 @@ class HomeViewController: UIViewController {
     }
     
     private func configureHeroHeaderView() {
-        APICaller.shared.makeRequest(type: [Title].self, category: .trendingMovie, query: nil) { [weak self] (result) in
+        APICaller.shared.makeRequest(type: TrendingTitleResponse.self, category: .trendingMovies, query: nil) { [weak self] (result) in
             switch result {
             case .success(let titles):
-                let selectedTitle = titles.randomElement()
-                self?.randomTrendingMovie = titles.randomElement()
+                let selectedTitle = titles.results.randomElement()
+                self?.randomTrendingMovie = titles.results.randomElement()
                 self?.headerView?.configure(with: TitleViewModel(titleName: selectedTitle?.original_title ?? "", posterURL: selectedTitle?.poster_path ?? ""))
             case .failure(let error):
                 print(error.localizedDescription)
             }
         }
-        
-        
-//        APICaller.shared.getTrendingMovies { [weak self] result in
-//            switch result {
-//            case .success(let titles):
-//                let selectedTitle = titles.randomElement()
-//                self?.randomTrendingMovie = titles.randomElement()
-//                self?.headerView?.configure(with: TitleViewModel(titleName: selectedTitle?.original_title ?? "", posterURL: selectedTitle?.poster_path ?? ""))
-//            case .failure(let error):
-//                print(error.localizedDescription)
-//            }
-//        }
     }
     
     private func configureNavBar() {
@@ -100,63 +88,14 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
+        // getHomeViewCell(index: IndexPath) -> CollectionViewTableViewCell
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CollectionViewTableViewCell.identifier, for: indexPath) as? CollectionViewTableViewCell else {
             return UITableViewCell()
         }
         
         cell.delegate = self
         // In each case we need the rawValue which will asign when we initialized or enumerate
-        switch indexPath.section {
-        case Sections.TrendingMovies.rawValue:
-            APICaller.shared.getTrendingMovies { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        case Sections.TrendingTv.rawValue:
-            APICaller.shared.getTrendingTvs { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        case Sections.Popular.rawValue:
-            APICaller.shared.getPopular { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        case Sections.Upcoming.rawValue:
-            APICaller.shared.getUpcomingMovies { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        case Sections.TopRated.rawValue:
-            APICaller.shared.getTopRatedMovies { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        default:
-            return UITableViewCell()
-        }
-        
+        configureCell(with: indexPath.section, cell: cell)
         return cell
     }
     
@@ -199,5 +138,22 @@ extension HomeViewController: CollectionViewTableViewCellDelegate {
             self?.navigationController?.pushViewController(vc, animated: true)
         }
         
+    }
+}
+
+// MARK: - Utils
+extension HomeViewController {
+    func configureCell(with index: Int, cell: CollectionViewTableViewCell) {
+        guard let category = UrlCategory(rawValue: index) else { return }
+        
+        APICaller.shared.makeRequest(type: TrendingTitleResponse.self, category: category) { (result) in
+            switch result {
+            case .success(let response):
+                let titles = response.results
+                cell.configure(with: titles)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
 }

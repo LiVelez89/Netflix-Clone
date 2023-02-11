@@ -46,10 +46,10 @@ class SearchViewController: UIViewController {
     }
     
     private func fetchDiscoverMovies() {
-        APICaller.shared.getDiscoverMovies { [weak self] result in
+        APICaller.shared.makeRequest(type: TrendingTitleResponse.self, category: .discoverMovies) { [weak self] result in
             switch result {
             case .success(let titles):
-                self?.titles = titles
+                self?.titles = titles.results
                 DispatchQueue.main.async {
                     self?.discoverTable.reloadData()
                 }
