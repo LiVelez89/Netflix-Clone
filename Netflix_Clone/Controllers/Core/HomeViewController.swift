@@ -21,6 +21,8 @@ class HomeViewController: UIViewController {
     
     private var headerView: HeroHeaderUIView?
     
+    private var navBarOffset: CGFloat = 0
+    
     let sectionTitles: [String] = ["Trending Movies", "Trending TV", "Popular", "Upcoming Movies", "Top rated"]
     
     private let homeFeedTable: UITableView = {
@@ -43,6 +45,11 @@ class HomeViewController: UIViewController {
         headerView = HeroHeaderUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTable.tableHeaderView = headerView
         configureHeroHeaderView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        offsetNavBar(offset: navBarOffset)
     }
     
     private func configureHeroHeaderView() {
@@ -121,8 +128,12 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let defaultOffset = view.safeAreaInsets.top
-        let offset = scrollView.contentOffset.y + defaultOffset
+        navBarOffset = scrollView.contentOffset.y + defaultOffset
         
+      offsetNavBar(offset: navBarOffset)
+    }
+    
+    func offsetNavBar(offset: CGFloat) {
         navigationController?.navigationBar.transform = .init(translationX: 0, y: min(0, -offset))
     }
 }
@@ -133,9 +144,11 @@ extension HomeViewController: CollectionViewTableViewCellDelegate {
     
     func collectionViewTableViewCellDidTapCell(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewViewModel) {
         DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             let vc = TitlePreviewViewController()
             vc.configure(with: viewModel)
-            self?.navigationController?.pushViewController(vc, animated: true)
+            self.navigationController?.pushViewController(vc, animated: true)
+            self.offsetNavBar(offset: 0)
         }
         
     }
