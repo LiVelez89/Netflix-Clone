@@ -9,16 +9,6 @@ import UIKit
 
 class HeroHeaderUIView: UIView {
     
-    private let downloadButton: UIButton = {
-       
-        let button = UIButton()
-        button.setTitle("Download", for: .normal)
-        button.layer.borderColor = UIColor.white.cgColor
-        button.layer.borderWidth = 1
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.layer.cornerRadius = 5
-        return button
-    }()
     
     private let playButton: UIButton = {
        
@@ -28,6 +18,7 @@ class HeroHeaderUIView: UIView {
         button.layer.borderWidth = 1
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 5
+        button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
 
         return button
     }()
@@ -55,26 +46,19 @@ class HeroHeaderUIView: UIView {
         addSubview(heroImageView)
         addGradiant()
         addSubview(playButton)
-        addSubview(downloadButton)
         applyConstraints()
     }
     
     private func applyConstraints() {
         
         let playButtonConstraints = [
-            playButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 70),
-            bottomAnchor.constraint(equalTo: playButton.bottomAnchor, constant: 50),
+            
+            playButton.centerXAnchor.constraint(equalTo: centerXAnchor),
+            bottomAnchor.constraint(equalToSystemSpacingBelow: playButton.bottomAnchor, multiplier: 6),
             playButton.widthAnchor.constraint(equalToConstant: 100)
         ]
         
-        let downloadButtonConstraints = [
-            trailingAnchor.constraint(equalTo: downloadButton.trailingAnchor, constant: 70),
-            downloadButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -50),
-            downloadButton.widthAnchor.constraint(equalToConstant: 120)
-        ]
-        
         NSLayoutConstraint.activate(playButtonConstraints)
-        NSLayoutConstraint.activate(downloadButtonConstraints)
     }
     public func configure(with model: TitleViewModel){
         guard let url = URL(string: "https://image.tmdb.org/t/p/w500/\(model.posterURL)") else {
@@ -92,4 +76,8 @@ class HeroHeaderUIView: UIView {
         fatalError()
     }
     
+    @objc func buttonAction(_ sender: UIButton) {
+        
+        print("pew")
+    }
 }

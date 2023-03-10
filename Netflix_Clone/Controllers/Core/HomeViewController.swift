@@ -21,6 +21,8 @@ class HomeViewController: UIViewController {
     
     private var headerView: HeroHeaderUIView?
     
+    private var navBarOffset: CGFloat = 0
+    
     let sectionTitles: [String] = ["Trending Movies", "Trending TV", "Popular", "Upcoming Movies", "Top rated"]
     
     private let homeFeedTable: UITableView = {
@@ -45,13 +47,17 @@ class HomeViewController: UIViewController {
         configureHeroHeaderView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        offsetNavBar(offset: navBarOffset)
+    }
+    
     private func configureHeroHeaderView() {
-        
-        APICaller.shared.getTrendingMovies { [weak self]result in
+        APICaller.shared.makeRequest(type: TrendingTitleResponse.self, category: .trendingMovies, query: nil) { [weak self] (result) in
             switch result {
             case .success(let titles):
-                let selectedTitle = titles.randomElement()
-                self?.randomTrendingMovie = titles.randomElement()
+                let selectedTitle = titles.results.randomElement()
+                self?.randomTrendingMovie = titles.results.randomElement()
                 self?.headerView?.configure(with: TitleViewModel(titleName: selectedTitle?.original_title ?? "", posterURL: selectedTitle?.poster_path ?? ""))
             case .failure(let error):
                 print(error.localizedDescription)
@@ -89,63 +95,14 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
+        // getHomeViewCell(index: IndexPath) -> CollectionViewTableViewCell
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CollectionViewTableViewCell.identifier, for: indexPath) as? CollectionViewTableViewCell else {
             return UITableViewCell()
         }
         
         cell.delegate = self
         // In each case we need the rawValue which will asign when we initialized or enumerate
-        switch indexPath.section {
-        case Sections.TrendingMovies.rawValue:
-            APICaller.shared.getTrendingMovies { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        case Sections.TrendingTv.rawValue:
-            APICaller.shared.getTrendingTvs { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        case Sections.Popular.rawValue:
-            APICaller.shared.getPopular { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        case Sections.Upcoming.rawValue:
-            APICaller.shared.getUpcomingMovies { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        case Sections.TopRated.rawValue:
-            APICaller.shared.getTopRatedMovies { result in
-                switch result {
-                case .success(let titles):
-                    cell.configure(with: titles)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
-        default:
-            return UITableViewCell()
-        }
-        
+        configureCell(with: indexPath.section, cell: cell)
         return cell
     }
     
@@ -171,8 +128,12 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let defaultOffset = view.safeAreaInsets.top
-        let offset = scrollView.contentOffset.y + defaultOffset
+        navBarOffset = scrollView.contentOffset.y + defaultOffset
         
+      offsetNavBar(offset: navBarOffset)
+    }
+    
+    func offsetNavBar(offset: CGFloat) {
         navigationController?.navigationBar.transform = .init(translationX: 0, y: min(0, -offset))
     }
 }
@@ -183,10 +144,29 @@ extension HomeViewController: CollectionViewTableViewCellDelegate {
     
     func collectionViewTableViewCellDidTapCell(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewViewModel) {
         DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             let vc = TitlePreviewViewController()
             vc.configure(with: viewModel)
-            self?.navigationController?.pushViewController(vc, animated: true)
+            self.navigationController?.pushViewController(vc, animated: true)
+            self.offsetNavBar(offset: 0)
         }
         
+    }
+}
+
+// MARK: - Utils
+extension HomeViewController {
+    func configureCell(with index: Int, cell: CollectionViewTableViewCell) {
+        guard let category = UrlCategory(rawValue: index) else { return }
+        
+        APICaller.shared.makeRequest(type: TrendingTitleResponse.self, category: category) { (result) in
+            switch result {
+            case .success(let response):
+                let titles = response.results
+                cell.configure(with: titles)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
 }

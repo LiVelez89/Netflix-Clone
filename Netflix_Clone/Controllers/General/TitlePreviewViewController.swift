@@ -20,9 +20,8 @@ class TitlePreviewViewController: UIViewController {
     private let titleLabel: UILabel = {
        
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false //what happens if it is true?
+        label.translatesAutoresizingMaskIntoConstraints = false 
         label.font = .systemFont(ofSize: 22, weight: .bold)
-        label.text = "Harry Potter"
         return label
     }()
     
@@ -30,9 +29,8 @@ class TitlePreviewViewController: UIViewController {
        
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 28, weight: .regular)
+        label.font = .systemFont(ofSize: 15, weight: .regular)
         label.numberOfLines = 0
-        label.text = "This is the best movie ever to watch as a kid!"
         return label
     }()
     
@@ -76,6 +74,8 @@ class TitlePreviewViewController: UIViewController {
         let overviewLabelConstraints = [
             overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15),
             overviewLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            overviewLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            overviewLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 120)
         ]
         
         let downloadButtonConstraints = [

@@ -39,10 +39,10 @@ class UpcomingViewController: UIViewController {
     }
     
     private func fetchUpcoming() {
-        APICaller.shared.getUpcomingMovies { [weak self] result in
+        APICaller.shared.makeRequest(type: TrendingTitleResponse.self, category: .upcomingMovies) { [weak self] result in
             switch result {
             case .success(let titles):
-                self?.titles = titles
+                self?.titles = titles.results
                 DispatchQueue.main.async {
                     self?.upcomingTable.reloadData()
                 }
