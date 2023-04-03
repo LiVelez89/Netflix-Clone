@@ -4,7 +4,7 @@
 //
 //  Created by Lina on 14/12/22.
 //
-// class responsable for downloading the data and also to work and to talk to core data API
+// class responsable for downloading the data and also to work and talk to core data API
 
 import Foundation
 import UIKit

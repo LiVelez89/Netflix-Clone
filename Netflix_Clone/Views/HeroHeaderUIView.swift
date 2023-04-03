@@ -13,10 +13,10 @@ class HeroHeaderUIView: UIView {
     private let playButton: UIButton = {
        
         let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Play", for: .normal)
         button.layer.borderColor = UIColor.white.cgColor
         button.layer.borderWidth = 1
-        button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 5
         button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
 

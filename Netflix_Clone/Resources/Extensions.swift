@@ -7,6 +7,7 @@
 
 import Foundation
 
+//Impplemented in Home titles: Trending, Upcoming...
 extension String {
     func capitalizeFirstLetter() -> String {
         return self.prefix(1).uppercased() + self.lowercased().dropFirst()

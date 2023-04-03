@@ -35,13 +35,14 @@ class TitlePreviewViewController: UIViewController {
     }()
     
     private let downloadButton: UIButton = {
-       
+
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .red
         button.setTitle("Download", for: .normal)
+        button.backgroundColor = .red
         button.layer.cornerRadius = 8
         button.layer.masksToBounds = true
+        button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
         return button
     }()
     
@@ -101,5 +102,9 @@ class TitlePreviewViewController: UIViewController {
         }
         
         webView.load(URLRequest(url: url))
+    }
+    @objc func buttonAction(_ sender: UIButton) {
+        
+        print("pew")
     }
 }
